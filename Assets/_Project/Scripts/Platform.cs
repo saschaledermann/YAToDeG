@@ -27,6 +27,7 @@ public class Platform : MonoBehaviour
         m_turret = turret;
         turret.transform.SetPositionAndRotation(m_socketPosition, transform.rotation);
         turret.transform.SetParent(transform);
+        turret.GetComponent<SphereCollider>().center = new Vector3(0f, -m_socketPosition.y, 0f);
         SocketState = SocketState.blocked;
     }
 }

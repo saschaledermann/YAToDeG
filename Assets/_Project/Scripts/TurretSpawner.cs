@@ -31,7 +31,11 @@ public class TurretSpawner : MonoBehaviour
                 {
                     m_objectPreview = Instantiate(turretPrefab, platform.GetSocketPosition(), platform.transform.rotation);
                     m_objectPreview.GetComponentInChildren<Collider>().enabled = false;
-                    m_objectPreview.transform.GetChild(0).GetComponent<MeshRenderer>().material = previewMaterial;
+                    var meshRenderers = m_objectPreview.transform.GetComponentsInChildren<MeshRenderer>();
+                    foreach (var renderer in meshRenderers)
+                    {
+                        renderer.material = previewMaterial;
+                    }
                 }
                 else if (!hit.transform.gameObject.TryGetComponent<Platform>(out var _) &&
                         m_objectPreview != null)
@@ -48,6 +52,7 @@ public class TurretSpawner : MonoBehaviour
                 if (hit.transform.gameObject.TryGetComponent<Platform>(out var platform) && platform.SocketState == SocketState.empty)
                 {
                     platform.PlaceTurret(m_objectRef);
+                    m_objectRef.GetComponentInChildren<Collider>().enabled = true;
                 }
                 else
                 {
