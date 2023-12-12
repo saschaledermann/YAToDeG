@@ -7,8 +7,14 @@ public class Turret : MonoBehaviour
     public Transform tower;
     public Transform gun;
 
+    [SerializeField] int m_damage = 5;
+    public int Damage { get => m_damage; }
+    [SerializeField] float m_cooldown = 0.25f;
+    float m_lastShotTime = -1f;
+
     List<Enemy> m_enemies = new();
     Enemy m_target;
+
 
     void Start()
     {
@@ -22,6 +28,7 @@ public class Turret : MonoBehaviour
         if (m_target != null)
         {
             AimAtTarget();
+            ShootAtTarget();
         }
         else
         {
@@ -55,6 +62,14 @@ public class Turret : MonoBehaviour
                                 targetPos.y,
                                 targetPos.z);
         gun.LookAt(gunAimAt);
+    }
+
+    void ShootAtTarget()
+    {
+        if (!(Mathf.Abs(m_lastShotTime - Time.time) > m_cooldown)) return;
+
+        m_target.TakeDamage(Damage);
+        m_lastShotTime = Time.time;
     }
 
     void Idle()
