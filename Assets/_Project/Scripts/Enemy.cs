@@ -6,6 +6,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] Transform m_destination;
     [SerializeField] int m_damage = 5;
     [SerializeField] int m_maxHealth = 100;
+    [SerializeField] Healthbar m_healthbar;
     int m_currentHealth;
     NavMeshAgent m_agent;
 
@@ -18,6 +19,11 @@ public class Enemy : MonoBehaviour
             m_agent.SetDestination(m_destination.position);
         
         m_currentHealth = m_maxHealth;
+    }
+
+    void Start()
+    {
+        m_healthbar.Init(m_maxHealth);
     }
 
     void OnTriggerEnter(Collider other)
@@ -42,6 +48,7 @@ public class Enemy : MonoBehaviour
             amount *= -1;
         
         m_currentHealth = m_currentHealth - amount < 0 ? 0 : m_currentHealth - amount;
+        m_healthbar.SetValue(m_currentHealth);
 
         if (m_currentHealth > 0)
             Debug.Log($"{transform.name} health is now at {m_currentHealth}.");

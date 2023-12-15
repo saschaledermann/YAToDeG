@@ -4,8 +4,9 @@ using UnityEngine;
 public class Turret : MonoBehaviour
 {
     [Range(3f, 15f)] public float range = 7.5f;
-    public Transform tower;
-    public Transform gun;
+    [SerializeField] Transform m_tower;
+    [SerializeField] Transform m_gun;
+    [SerializeField] AudioClip m_shotSound;
 
     [SerializeField] int m_damage = 5;
     public int Damage { get => m_damage; }
@@ -14,12 +15,14 @@ public class Turret : MonoBehaviour
 
     List<Enemy> m_enemies = new();
     Enemy m_target;
+    ParticleSystem[] m_particleSystems;
 
 
     void Start()
     {
         var sphereCollider = GetComponent<SphereCollider>();
         sphereCollider.radius = range;
+        m_particleSystems = GetComponentsInChildren<ParticleSystem>();
     }
 
     void Update()
@@ -54,28 +57,33 @@ public class Turret : MonoBehaviour
     {
         var targetPos = m_target.transform.position;
         var turretAimAt = new Vector3(targetPos.x,
-                                tower.position.y,
+                                m_tower.position.y,
                                 targetPos.z);
-        tower.LookAt(turretAimAt);
+        m_tower.LookAt(turretAimAt);
 
         var gunAimAt = new Vector3(targetPos.x,
                                 targetPos.y,
                                 targetPos.z);
-        gun.LookAt(gunAimAt);
+        m_gun.LookAt(gunAimAt);
     }
 
     void ShootAtTarget()
     {
         if (!(Mathf.Abs(m_lastShotTime - Time.time) > m_cooldown)) return;
 
+        foreach (var ps in m_particleSystems)
+        {
+            ps.Play();
+        }
+        PlaySound();
         m_target.TakeDamage(Damage);
         m_lastShotTime = Time.time;
     }
 
     void Idle()
     {
-        tower.localRotation = Quaternion.identity;
-        gun.localRotation = Quaternion.identity;
+        m_tower.localRotation = Quaternion.identity;
+        m_gun.localRotation = Quaternion.identity;
     }
 
     void EvaluateTarget()
@@ -101,6 +109,15 @@ public class Turret : MonoBehaviour
         }
     }
 
+    void PlaySound()
+    {
+        var soundSource = new GameObject("shot", typeof(AudioSource)).GetComponent<AudioSource>();
+        soundSource.gameObject.transform.parent = transform;
+        soundSource.clip = m_shotSound;
+        soundSource.Play();
+        Destroy(soundSource.gameObject, m_shotSound.length);
+    }
+    
     void OnDrawGizmos()
     {
         if (Application.isPlaying)
