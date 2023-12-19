@@ -12,6 +12,7 @@ public class Turret : MonoBehaviour
     public int Damage { get => m_damage; }
     [SerializeField] float m_cooldown = 0.25f;
     float m_lastShotTime = -1f;
+    [SerializeField] float m_rotationSpeed = 5;
 
     List<Enemy> m_enemies = new();
     Enemy m_target;
@@ -55,16 +56,19 @@ public class Turret : MonoBehaviour
 
     void AimAtTarget()
     {
+        var step = m_rotationSpeed * Time.deltaTime;
         var targetPos = m_target.transform.position;
         var turretAimAt = new Vector3(targetPos.x,
                                 m_tower.position.y,
                                 targetPos.z);
-        m_tower.LookAt(turretAimAt);
+        m_tower.rotation = Quaternion.Slerp(m_tower.rotation, Quaternion.LookRotation(turretAimAt - m_tower.position), step);
 
         var gunAimAt = new Vector3(targetPos.x,
                                 targetPos.y,
                                 targetPos.z);
-        m_gun.LookAt(gunAimAt);
+        var gunAimDir = Quaternion.LookRotation(gunAimAt - m_gun.position);
+        var localGunAimDir = Quaternion.Euler(new Vector3(gunAimDir.eulerAngles.x, 0, 0));
+        m_gun.localRotation = Quaternion.Slerp(m_gun.localRotation, localGunAimDir, step);
     }
 
     void ShootAtTarget()
@@ -82,8 +86,9 @@ public class Turret : MonoBehaviour
 
     void Idle()
     {
-        m_tower.localRotation = Quaternion.identity;
-        m_gun.localRotation = Quaternion.identity;
+        var step = Time.deltaTime;
+        m_tower.localRotation = Quaternion.Slerp(m_tower.localRotation, Quaternion.identity, step);
+        m_gun.localRotation = Quaternion.Slerp(m_gun.localRotation, Quaternion.identity, step);
     }
 
     void EvaluateTarget()
