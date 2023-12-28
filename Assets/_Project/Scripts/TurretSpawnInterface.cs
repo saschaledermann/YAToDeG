@@ -72,6 +72,11 @@ public class TurretSpawnInterface : MonoBehaviour, IDragHandler, IBeginDragHandl
             {
                 platform.PlaceTurret(m_objectRef);
                 m_objectRef.GetComponentInChildren<Collider>().enabled = true;
+                var colliders = m_objectRef.GetComponents<Collider>();
+                foreach (var collider in colliders)
+                {
+                    collider.enabled = true;
+                }
             }
             else
             {
@@ -93,6 +98,11 @@ public class TurretSpawnInterface : MonoBehaviour, IDragHandler, IBeginDragHandl
         {
             m_objectRef = Instantiate(m_turretPrefab, hit.point, Quaternion.identity);
             m_objectRef.GetComponentInChildren<Collider>().enabled = false;
+            var colliders = m_objectRef.GetComponents<Collider>();
+            foreach (var collider in colliders)
+            {
+                collider.enabled = false;
+            }
         }
     }
 }

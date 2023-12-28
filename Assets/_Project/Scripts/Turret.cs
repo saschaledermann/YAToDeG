@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class Turret : MonoBehaviour
+public class Turret : MonoBehaviour, IPointerClickHandler
 {
     [Range(3f, 15f)] public float range = 7.5f;
     [SerializeField] Transform m_tower;
@@ -17,7 +18,6 @@ public class Turret : MonoBehaviour
     List<Enemy> m_enemies = new();
     Enemy m_target;
     ParticleSystem[] m_particleSystems;
-
 
     void Start()
     {
@@ -130,5 +130,12 @@ public class Turret : MonoBehaviour
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(new Vector3(transform.position.x, 0f, transform.position.z), range);
         }
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (UpgradeUI.Instance == null) return;
+
+        UpgradeUI.Instance.OpenTurretUI(this);
     }
 }
