@@ -4,16 +4,21 @@ using UnityEngine.EventSystems;
 
 public class Turret : MonoBehaviour, IPointerClickHandler
 {
-    [Range(3f, 15f)] public float range = 7.5f;
     [SerializeField] Transform m_tower;
     [SerializeField] Transform m_gun;
     [SerializeField] AudioClip m_shotSound;
 
-    [SerializeField] int m_damage = 5;
-    public int Damage { get => m_damage; }
-    [SerializeField] float m_cooldown = 0.25f;
+    [SerializeField] TurretDetails m_turretDetails;
+    public string Name { get => m_turretDetails.Name; }
+    public int Damage { get => m_turretDetails.Damage + (m_currentLevel - 1) * m_turretDetails.DamageIncrement; }
+    public float RateOfFire { get => m_turretDetails.RateOfFire + (m_currentLevel - 1) * m_turretDetails.RateOfFireIncrement; }
+    public int UpgradeCost { get => m_turretDetails.UpgradeCost; }
+    public int SellAmount { get => m_turretDetails.UpgradeCost - ((int) Mathf.Floor(m_turretDetails.UpgradeCost / 2)); }
+    public int MaxLevel { get => m_turretDetails.MaxLevel; }
+    int m_currentLevel = 1;
+    public int Level { get => m_currentLevel; }
     float m_lastShotTime = -1f;
-    [SerializeField] float m_rotationSpeed = 5;
+    readonly float m_rotationSpeed = 5;
 
     List<Enemy> m_enemies = new();
     Enemy m_target;
@@ -22,7 +27,7 @@ public class Turret : MonoBehaviour, IPointerClickHandler
     void Start()
     {
         var sphereCollider = GetComponent<SphereCollider>();
-        sphereCollider.radius = range;
+        sphereCollider.radius = m_turretDetails.Range;
         m_particleSystems = GetComponentsInChildren<ParticleSystem>();
     }
 
@@ -73,7 +78,7 @@ public class Turret : MonoBehaviour, IPointerClickHandler
 
     void ShootAtTarget()
     {
-        if (!(Mathf.Abs(m_lastShotTime - Time.time) > m_cooldown)) return;
+        if (!(Mathf.Abs(m_lastShotTime - Time.time) > (1 / RateOfFire))) return;
 
         foreach (var ps in m_particleSystems)
         {
@@ -123,12 +128,19 @@ public class Turret : MonoBehaviour, IPointerClickHandler
         Destroy(soundSource.gameObject, m_shotSound.length);
     }
     
+    public void Upgrade()
+    {
+        if (m_currentLevel >= m_turretDetails.MaxLevel) return;
+
+        m_currentLevel++;
+    }
+    
     void OnDrawGizmos()
     {
         if (Application.isPlaying)
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(new Vector3(transform.position.x, 0f, transform.position.z), range);
+            Gizmos.DrawWireSphere(new Vector3(transform.position.x, 0f, transform.position.z), m_turretDetails.Range);
         }
     }
 

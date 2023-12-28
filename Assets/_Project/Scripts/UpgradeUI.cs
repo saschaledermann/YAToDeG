@@ -1,13 +1,23 @@
 using System.Collections;
-using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UpgradeUI : MonoBehaviour
 {
+#region UIElements
     [SerializeField] Button m_upgradeButton;
     [SerializeField] Button m_sellButton;
     [SerializeField] Button m_closeButton;
+    [SerializeField] Image m_turretSprite;
+    [SerializeField] TMP_Text m_nameText;
+    [SerializeField] TMP_Text m_damageText;
+    [SerializeField] TMP_Text m_rofText;
+    [SerializeField] TMP_Text m_levelText;
+    [SerializeField] TMP_Text m_upgradeCostText;
+    [SerializeField] TMP_Text m_sellText;
+#endregion
+    
     Turret m_turretRef;
     bool m_isMoving = false;
     bool m_hidden = true;
@@ -15,7 +25,6 @@ public class UpgradeUI : MonoBehaviour
     Vector3 m_showPos;
     public static UpgradeUI Instance { get; private set; }
 
-    // Start is called before the first frame update
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -33,6 +42,7 @@ public class UpgradeUI : MonoBehaviour
         m_hidePos = m_showPos = transform.GetChild(0).transform.localPosition;
         m_showPos.x = m_hidePos.x * -1;
 
+        m_upgradeButton.onClick.AddListener(() => UpgradeTurret());
         m_closeButton.onClick.AddListener(() => TogglePanel(false));
     }
 
@@ -40,9 +50,29 @@ public class UpgradeUI : MonoBehaviour
     {
         if (turret == null) return;
 
-        Debug.Log("UI opened!");
         m_turretRef = turret;
+        UpdateTurretUiInfo(turret);
         TogglePanel();
+    }
+
+    void UpgradeTurret()
+    {
+        if (m_turretRef == null) return;
+
+        m_turretRef.Upgrade();
+        UpdateTurretUiInfo(m_turretRef);
+    }
+
+    void UpdateTurretUiInfo(Turret turret)
+    {
+        if (turret == null) return;
+
+        m_nameText.text = $"Turret: {turret.Name}";
+        m_damageText.text = $"Damage: {turret.Damage}";
+        m_rofText.text = $"Rate of fire: {turret.RateOfFire}";
+        m_levelText.text = $"Level: {turret.Level} / {turret.MaxLevel}";
+        m_upgradeCostText.text = $"Upgrade cost: {turret.UpgradeCost}";
+        m_sellText.text = $"Sells for: {turret.SellAmount}";
     }
 
     void TogglePanel(bool open = true)
