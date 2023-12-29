@@ -18,6 +18,7 @@ public class Spawner : MonoBehaviour
 
     void Spawn()
     {
+        if (GameManager.Instance != null && GameManager.Instance.IsPaused) return; 
         var spawnPos = transform.position;
         spawnPos.y = 0f;
         var enemy = Instantiate(enemyPrefab, spawnPos, Quaternion.identity).GetComponent<Enemy>();

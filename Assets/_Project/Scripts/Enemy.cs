@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -11,6 +12,7 @@ public class Enemy : MonoBehaviour
     NavMeshAgent m_agent;
 
     public int Damage { get => m_damage; }
+    public static event Action EnemyDieEvent;
 
     void Awake()
     {
@@ -54,5 +56,10 @@ public class Enemy : MonoBehaviour
             Debug.Log($"{transform.name} health is now at {m_currentHealth}.");
         else
             Destroy(gameObject);
+    }
+
+    void OnDisable()
+    {
+        EnemyDieEvent.Invoke();
     }
 }

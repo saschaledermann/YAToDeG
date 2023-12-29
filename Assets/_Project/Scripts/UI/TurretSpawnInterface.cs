@@ -56,6 +56,11 @@ public class TurretSpawnInterface : MonoBehaviour, IDragHandler, IBeginDragHandl
     {
         m_objectPreview = Instantiate(m_turretPrefab, platform.GetSocketPosition(), platform.transform.rotation);
         m_objectPreview.GetComponentInChildren<Collider>().enabled = false;
+        var colliders = m_objectRef.GetComponents<Collider>();
+        foreach (var collider in colliders)
+        {
+            collider.enabled = false;
+        }
         var meshRenderers = m_objectPreview.transform.GetComponentsInChildren<MeshRenderer>();
         foreach (var renderer in meshRenderers)
         {
