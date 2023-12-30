@@ -52,14 +52,12 @@ public class Enemy : MonoBehaviour
         m_currentHealth = m_currentHealth - amount < 0 ? 0 : m_currentHealth - amount;
         m_healthbar.SetValue(m_currentHealth);
 
-        if (m_currentHealth > 0)
-            Debug.Log($"{transform.name} health is now at {m_currentHealth}.");
-        else
+        if (m_currentHealth <= 0)
             Destroy(gameObject);
     }
 
     void OnDisable()
     {
-        EnemyDieEvent.Invoke();
+        EnemyDieEvent?.Invoke();
     }
 }
